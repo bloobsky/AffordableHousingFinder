@@ -129,31 +129,13 @@ if button == "Submit":
     daft.set_sort_type(SortType.PRICE_ASC)
     daft.set_max_price(Person.calc_price(user))
 
-    listings = daft.search()
+listings = daft.search(max_pages=2)
+    
+layout = []
 
-    # cache the listings in the local file
-    with open("result.txt", "w") as fp:
-        fp.writelines("%s\n" % listing.as_dict_for_mapping() for listing in listings)
+layout =  [[sg.Text(f'{listing.title}. '), sg.In(key=listing)] for listing in listings]
 
-    # read from the local file
-    with open("result.txt") as fp:
-      lines = fp.readlines()
-
-    properties = []
-    for line in lines:
-      properties.append(eval(line))
-
-    df = pd.DataFrame(properties)
-    print(df)
-
-    map_html = MapVisualization(df)
-    map_html.add_markers()
-    map_html.add_colorbar()
-    map_html.save("ireland_map.html")
-    print("Done, please checkout the html file")    
-
-    #layout  = [[sg.Text(f'{i}. '), sg.In(key=i)] for listing in listings] + [sg.Button('Exit')]
-
-    #window = sg.Window('To Do List Example', layout)
-
-    #event, values = window.read()
+    #print(listing.title)
+layout += [[sg.Button('Save'), sg.Button('Exit')]]
+window = sg.Window('To Do List Example', layout)
+event, values = window.read()
