@@ -8,6 +8,7 @@ import PySimpleGUI as sg
 import urllib.request
 import local_settings 
 import pandas as pd
+import csv
 from daftlistings import Daft, Location, SearchType, PropertyType, SortType, MapVisualization
 
 def check_connection():
@@ -117,7 +118,7 @@ if button == "Submit":
     elif user.where == "GALWAY_CITY":
         daft.set_location(Location.GALWAY_CITY)
     elif user.where == "LIMERICK_CITY":
-        daft.set_lcoation(Location.LIMERICK_CITY)
+        daft.set_location(Location.LIMERICK_CITY)
     else:
         daft.set_location(Location.CORK_CITY)
 
@@ -129,13 +130,24 @@ if button == "Submit":
     daft.set_sort_type(SortType.PRICE_ASC)
     daft.set_max_price(Person.calc_price(user))
 
-listings = daft.search(max_pages=2)
+listings = daft.search() # add max_pages=value to change how many pages would be searched
     
 layout = []
 
-layout =  [[sg.Text(f'{listing.title}. '), sg.In(key=listing)] for listing in listings]
+limit = 0 
+csv_generator = ['Property', 'Price', '\n']
+
+for listing in listings:
+
+    layout +=  [[sg.Text(f'{listing.title}. '), sg.Text(f'{listing.price}. '), sg.Text(f'{listing.daft_link}. ')]]
+    csv_generator += ((listing.title, listing.price, '\n'))
+    # print(csv_generator)
+
+    if limit == 25: # here limits number of results
+        break
+    limit += 1
 
     #print(listing.title)
-layout += [[sg.Button('Save'), sg.Button('Exit')]]
-window = sg.Window('To Do List Example', layout)
+layout += [[sg.Button('Exit')]]
+window = sg.Window('Your results ' +user.name, layout)
 event, values = window.read()
