@@ -142,7 +142,9 @@ for listing in listings:
     layout +=  [[sg.Text(f'{listing.title}. '), sg.Text(f'{listing.price}. '), sg.Text(f'{listing.daft_link}. ')]]
     csv_generator += ((listing.title, listing.price, '\n'))
     # print(csv_generator)
-
+    with open('Results.csv', 'w+') as csvfile:
+        my_file = csv.writer(csvfile, delimiter = ' ')
+        my_file.writerow(csv_generator)
     if limit == 25: # here limits number of results
         break
     limit += 1
