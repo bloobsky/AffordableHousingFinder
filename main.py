@@ -11,6 +11,10 @@ import pandas as pd
 import csv
 from daftlistings import Daft, Location, SearchType, PropertyType, SortType, MapVisualization
 
+# setting theme for gui
+
+sg.theme('DarkAmber')
+
 def check_connection():
     """ func that checks connection to daft.ie """
     status_code = urllib.request.urlopen(local_settings.DAFT_URL).getcode()
@@ -71,8 +75,6 @@ class Person():
 
 
 """ Main Program Loop""" 
-
-fonts = local_settings.FONT_SMALL
 # Very basic form.  Return values as a list
 form = sg.FlexForm('Dream House Finder')  # begin with a blank form
 
@@ -91,6 +93,7 @@ layout = [
 button, values = form.Layout(layout).Read()
 
 if button == "Submit":
+    form.close()
     user = Person(values[0], values[1], int(float(values[2])), values[3], values[4])
     print(button, values[0], values[1], values[2], values[3], values[4])
     print(user)
@@ -109,7 +112,6 @@ layout = [
          ]
 
 button, values = form.Layout(layout).Read()
-
 if button == "Submit":
 
     daft = Daft()
@@ -122,7 +124,7 @@ if button == "Submit":
     else:
         daft.set_location(Location.CORK_CITY)
 
-    if user.kind == "RESIDENTIAL_SALE":
+    if user.action == "RESIDENTIAL_SALE":
         daft.set_search_type(SearchType.RESIDENTIAL_SALE)
     else:
         daft.set_search_type(SearchType.RESIDENTIAL_RENT)
@@ -131,6 +133,7 @@ if button == "Submit":
     daft.set_max_price(Person.calc_price(user))
 
 listings = daft.search() # add max_pages=value to change how many pages would be searched
+form.close() # closing the window
     
 layout = []
 
@@ -150,6 +153,10 @@ for listing in listings:
     limit += 1
 
     #print(listing.title)
+    # last window
 layout += [[sg.Button('Exit')]]
 window = sg.Window('Your results ' +user.name, layout)
-event, values = window.read()
+button, values = window.read()
+
+if button == "Exit": # closin the program
+    window.close() 
